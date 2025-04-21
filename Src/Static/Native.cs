@@ -28,19 +28,14 @@ internal class Native
 
     #endregion
 
-    internal static InitializeDelegate Initialize;
     internal delegate void InitializeDelegate();
 
-    internal static GetClientsDelegate GetClients;
     internal delegate IntPtr GetClientsDelegate();
 
-    internal static ExecuteAsyncDelegate ExecuteAsync;
     internal delegate void ExecuteAsyncDelegate(
         byte[] Source,
         string[] Clients,
         int Length);
-
-    internal static string ModuleName = "Nimbus.dll";
 
     internal static T Resolve<T>(string Module, string Function)
     {
@@ -54,12 +49,5 @@ internal class Native
         return hFunction == IntPtr.Zero
             ? throw new NimbusException($"Failed To Get Function: {Function}")
             : Marshal.GetDelegateForFunctionPointer<T>(hFunction);
-    }
-
-    static Native()
-    {
-        Initialize = Resolve<InitializeDelegate>(ModuleName, "Initialize");
-        GetClients = Resolve<GetClientsDelegate>(ModuleName, "GetClients");
-        ExecuteAsync = Resolve<ExecuteAsyncDelegate>(ModuleName, "ExecuteAsync");
     }
 }

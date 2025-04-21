@@ -28,16 +28,19 @@ public class Library : IDisposable
 {
     internal Options Options;
 
-    public event EventHandler OnInjectionComplete;
+    internal ExecuteAsyncDelegate ExecuteAsync;
+    internal GetClientsDelegate GetClients;
+    internal InitializeDelegate Initialize;
+
+    internal string ModuleName => $"{this.Options.Name}-Module.dll";
 
     public Library(Options Options)
     {
         this.Options = Options;
-        ModuleName = $"{Options.Name}.dll";
 
         Dictionary<string, string> Dependencies = new Dictionary<string, string>
         {
-            { $"{Options.Name}.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/Cloudy.dll" },
+            { this.ModuleName, "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/Cloudy.dll" },
             { "libcrypto-3-x64.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/libcrypto-3-x64.dll" },
             { "libssl-3-x64.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/libssl-3-x64.dll" },
             { "xxhash.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/xxhash.dll" },
@@ -55,6 +58,10 @@ public class Library : IDisposable
             if (!File.Exists(Files.Key))
                 throw new NimbusException($"Failed To Download Dependency: {Files.Key}");
         }
+
+        this.Initialize = Resolve<InitializeDelegate>(this.ModuleName, "Initialize");
+        this.GetClients = Resolve<GetClientsDelegate>(this.ModuleName, "GetClients");
+        this.ExecuteAsync = Resolve<ExecuteAsyncDelegate>(this.ModuleName, "ExecuteAsync");
     }
 
     public void Inject()
@@ -65,15 +72,10 @@ public class Library : IDisposable
         if (Process.GetProcessesByName("RobloxPlayerBeta").Length is 0)
             throw new NimbusException("RobloxPlayerBeta Not Found");
 
-        Initialize();
+        this.Initialize();
 
         if (this.Clients is null || this.Clients.Count is 0)
             Thread.Sleep(TimeSpan.FromSeconds(1));
-
-        string[] ClientList = (from x in this.Clients select x.Name).ToArray();
-
-        if (OnInjectionComplete is not null)
-            OnInjectionComplete.Invoke(this, EventArgs.Empty);
     }
 
     public void Execute(string Script)
@@ -85,7 +87,7 @@ public class Library : IDisposable
             throw new NimbusException("No Clients Found");
 
         string[] ClientList = (from x in this.Clients select x.Name).ToArray();
-        ExecuteAsync(Encoding.UTF8.GetBytes(Script), ClientList, ClientList.Length);
+        this.ExecuteAsync(Encoding.UTF8.GetBytes(Script), ClientList, ClientList.Length);
     }
 
     public bool IsInjected => this.Clients is not null;
@@ -119,7 +121,7 @@ public class Library : IDisposable
 
         this.Clients.Clear();
 
-        IntPtr hModule = GetModuleHandle(ModuleName);
+        IntPtr hModule = GetModuleHandle(this.ModuleName);
         if (hModule != IntPtr.Zero)
         {
             FreeLibrary(hModule);

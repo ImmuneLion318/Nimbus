@@ -40,11 +40,9 @@ public class Library : IDisposable
 
         Dictionary<string, string> Dependencies = new Dictionary<string, string>
         {
-            { this.ModuleName, "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/Cloudy.dll" },
-            { "libcrypto-3-x64.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/libcrypto-3-x64.dll" },
-            { "libssl-3-x64.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/libssl-3-x64.dll" },
-            { "xxhash.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/xxhash.dll" },
-            { "zstd.dll", "https://github.com/CloudyExecugor/frontend/releases/download/reareaaaa/zstd.dll" },
+            { this.ModuleName, "https://github.com/Delforello/Saturn-X/raw/main/Xeno.dll" },
+            { "libcrypto-3-x64.dll", "https://github.com/Delforello/Saturn-X/raw/main/libcrypto-3-x64.dll" },
+            { "libssl-3-x64.dll", "https://github.com/Delforello/Saturn-X/raw/main/libssl-3-x64.dll" },
         };
 
         foreach (KeyValuePair<string, string> Files in Dependencies)
